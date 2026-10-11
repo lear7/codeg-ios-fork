@@ -39,6 +39,9 @@ struct SessionListView: View {
     @State private var folderError: String?
     /// The group currently zoom-expanded to fullscreen, or `nil`.
     @State private var expandedSection: ChatExpand?
+    /// Session chosen from the search-result context menu, awaiting confirm.
+    /// The expanded list confirms inside its own cover.
+    @State private var pendingDelete: ConversationSummary?
     /// Shared namespace pairing each card's `matchedTransitionSource` with the
     /// fullscreen's `.navigationTransition(.zoom)`.
     @Namespace private var cardNS
@@ -145,6 +148,9 @@ struct SessionListView: View {
         // grouping — refetch so the new group/merge shows without waiting.
         .onReceive(NotificationCenter.default.publisher(for: .foldersDidChange)) { _ in
             Task { await viewModel.refresh() }
+        }
+        .deleteSessionConfirmation($pendingDelete) { conversation in
+            deleteConversation(conversation)
         }
     }
 
@@ -280,7 +286,8 @@ struct SessionListView: View {
                     isSelected: conv.id == selectedConversationID,
                     folderName: viewModel.folderNames[conv.folderId],
                     onTap: { select(conv) },
-                    onTogglePin: { togglePin(conv) }
+                    onTogglePin: { togglePin(conv) },
+                    onDelete: { pendingDelete = conv }
                 )
             }
         }
@@ -304,6 +311,7 @@ struct SessionListView: View {
             // instead of zooming back to this list and pushing afterward.
             onOpen: { id in open(id: id); expandedSection = nil },
             onTogglePin: { conv in togglePin(conv) },
+            onDelete: { conv in deleteConversation(conv) },
             onClose: { expandedSection = nil }
         )
         .navigationTransition(.zoom(sourceID: section.id, in: cardNS))
@@ -402,6 +410,24 @@ struct SessionListView: View {
 
     private func togglePin(_ conversation: ConversationSummary) {
         Task { await viewModel.setPinned(conversation, pinned: !conversation.isPinned) }
+    }
+
+    /// Confirmed delete. Drops the row on success and surfaces `viewModel.error`
+    /// on failure. Clears a detail selection of this session, and dismisses the
+    /// expanded cover when its last row is gone.
+    private func deleteConversation(_ conversation: ConversationSummary) {
+        let section = expandedSection
+        Task {
+            let removed = await viewModel.delete(conversation)
+            guard removed else { return }
+            if selectedConversationID == conversation.id {
+                selectedConversationID = nil
+            }
+            guard let section else { return }
+            if sectionData(section).conversations.isEmpty {
+                expandedSection = nil
+            }
+        }
     }
 
     /// The big, left-aligned server name rendered as a `Menu` so it's tappable in

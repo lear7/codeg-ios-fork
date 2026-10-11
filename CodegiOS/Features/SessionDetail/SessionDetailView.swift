@@ -258,16 +258,14 @@ struct SessionDetailView: View {
                         isStarting: model.hasStartedFirstSend
                     )
                     if model.isDraftEditable {
-                        HStack {
-                            if model.chatAvailable {
-                                Button("Start chat (no folder)", systemImage: "bubble.left.and.bubble.right") {
-                                    Task { await model.selectChat() }
-                                }
-                                .buttonStyle(.borderedProminent)
-                            }
-                            Button("Open Folder", systemImage: "folder.badge.plus") { showFolderBrowser = true }
-                                .buttonStyle(.bordered)
-                        }
+                        // Side by side when both labels fit; otherwise stack so a
+                        // long localization ("开始聊天（无文件夹）") stays one line
+                        // instead of wrapping inside the dark pill.
+                        NewSessionSetupActions(
+                            showsChat: model.chatAvailable,
+                            onStartChat: { Task { await model.selectChat() } },
+                            onOpenFolder: { showFolderBrowser = true }
+                        )
                         if model.availableFolders.isEmpty {
                             Text("No folders yet. Start a chat or open a folder.")
                                 .font(.caption)
@@ -400,6 +398,84 @@ private struct JumpToLatestButton: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Jump to latest")
+    }
+}
+
+/// The new-task "start chat" / "open folder" pills. `ViewThatFits` keeps them
+/// on one row when the labels fit, and stacks them (still one line each) on a
+/// narrow phone where the horizontal ideal width would wrap the longer label.
+private struct NewSessionSetupActions: View {
+    let showsChat: Bool
+    let onStartChat: () -> Void
+    let onOpenFolder: () -> Void
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            actionRow(stacked: false)
+            actionRow(stacked: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func actionRow(stacked: Bool) -> some View {
+        if stacked {
+            VStack(alignment: .leading, spacing: 8) { buttons }
+        } else {
+            HStack(alignment: .center, spacing: 8) { buttons }
+        }
+    }
+
+    @ViewBuilder
+    private var buttons: some View {
+        if showsChat {
+            setupButton(
+                title: "Start chat (no folder)",
+                systemImage: "bubble.left.and.bubble.right",
+                prominent: true,
+                action: onStartChat
+            )
+        }
+        setupButton(
+            title: "Open Folder",
+            systemImage: "folder.badge.plus",
+            prominent: false,
+            action: onOpenFolder
+        )
+    }
+
+    @ViewBuilder
+    private func setupButton(
+        title: LocalizedStringKey,
+        systemImage: String,
+        prominent: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        // Styles stay in separate branches: `.bordered` and `.borderedProminent`
+        // are different types, so a ternary does not type-check. `fixedSize`
+        // reports the single-line ideal width so ViewThatFits stacks instead of
+        // letting the pill wrap, and keeps a stacked pill content-sized.
+        if prominent {
+            setupLabel(title: title, systemImage: systemImage, action: action)
+                .buttonStyle(.borderedProminent)
+                .fixedSize(horizontal: true, vertical: true)
+        } else {
+            setupLabel(title: title, systemImage: systemImage, action: action)
+                .buttonStyle(.bordered)
+                .fixedSize(horizontal: true, vertical: true)
+        }
+    }
+
+    private func setupLabel(
+        title: LocalizedStringKey,
+        systemImage: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
     }
 }
 

@@ -46,12 +46,22 @@ struct AboutView: View {
     private var build: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
     }
+    /// Home-screen name from the built plist (`CODEG_DISPLAY_NAME`). Fork builds
+    /// pass `Codeg New`; fall back to that if the key was not substituted.
+    private var forkDisplayName: String {
+        let raw = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? ""
+        let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "Codeg New" : trimmed
+    }
+
     private var appName: String {
         guard Bundle.main.object(forInfoDictionaryKey: "CodegFlavor") as? String == "fork" else {
             return "Codeg"
         }
-        let commit = Bundle.main.object(forInfoDictionaryKey: "CodegBuildCommit") as? String ?? ""
-        return commit.isEmpty ? "Codeg-Fork" : "Codeg-Fork · \(commit)"
+        let commit = (Bundle.main.object(forInfoDictionaryKey: "CodegBuildCommit") as? String ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let name = forkDisplayName
+        return commit.isEmpty ? name : "\(name) · \(commit)"
     }
 
     var body: some View {

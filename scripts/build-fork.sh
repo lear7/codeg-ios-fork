@@ -51,7 +51,7 @@ trap 'rm -rf "$WORK_DIR"' EXIT
 
 BUILD_ARGS=(-project CodegiOS.xcodeproj -scheme CodegiOS -configuration Debug
   -skipMacroValidation
-  CODEG_DISPLAY_NAME=Codeg-Fork
+  'CODEG_DISPLAY_NAME=Codeg New'
   'CODEG_BUNDLE_ID=app.codeg.ios.fork$(CODEG_BUNDLE_ID_SUFFIX)'
   CODEG_URL_SCHEME=codegfork CODEG_FLAVOR=fork
   "CODEG_BUILD_COMMIT=$(git rev-parse --short HEAD)")
@@ -130,7 +130,7 @@ with open(sys.argv[1], "rb") as f:
 bundle_id = info["CFBundleIdentifier"]
 schemes = [s for t in info.get("CFBundleURLTypes", []) for s in t.get("CFBundleURLSchemes", [])]
 if (not re.fullmatch(r"app\.codeg\.ios\.fork(?:\.[A-Za-z0-9-]+)*", bundle_id)
-        or info.get("CFBundleDisplayName") != "Codeg-Fork"
+        or info.get("CFBundleDisplayName") != "Codeg New"
         or info.get("CodegFlavor") != "fork" or schemes != ["codegfork"]
         or not info.get("CodegBuildCommit")):
     sys.exit("error: built app does not have the expected isolated fork identity; refusing install/launch")
