@@ -124,11 +124,17 @@ struct SessionSectionFullScreen: View {
     var folderName: (ConversationSummary) -> String? = { _ in nil }
     let onOpen: (Int) -> Void
     var onTogglePin: ((ConversationSummary) -> Void)?
+    /// Called after the user confirms Delete. `nil` hides the menu item.
+    var onDelete: ((ConversationSummary) -> Void)? = nil
     /// Dismisses the fullscreen. The host drives this by clearing the cover's
     /// item binding (`expandedSection = nil`) — the same path the row-open flow
     /// uses. `@Environment(\.dismiss)` is a no-op for a cover presented with
     /// `.navigationTransition(.zoom)`, so the close button reports up instead.
     let onClose: () -> Void
+
+    /// The row whose delete the user must confirm. Owned here so the alert
+    /// presents over this cover (a parent alert does not).
+    @State private var pendingDelete: ConversationSummary?
 
     /// "N sessions total" eyebrow shown above the big title.
     private var totalLabel: LocalizedStringKey {
@@ -150,7 +156,10 @@ struct SessionSectionFullScreen: View {
                         isSelected: false,
                         folderName: folderName(conv),
                         onTap: { onOpen(conv.id) },
-                        onTogglePin: onTogglePin.map { toggle in { toggle(conv) } }
+                        onTogglePin: onTogglePin.map { toggle in { toggle(conv) } },
+                        onDelete: onDelete.map { _ -> () -> Void in
+                            return { pendingDelete = conv }
+                        }
                     )
                     .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8))
                     .listRowSeparator(.hidden)
@@ -173,6 +182,9 @@ struct SessionSectionFullScreen: View {
                     }
                     .accessibilityLabel("Close")
                 }
+            }
+            .deleteSessionConfirmation($pendingDelete) { conversation in
+                onDelete?(conversation)
             }
         }
     }

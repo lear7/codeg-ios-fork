@@ -22,17 +22,25 @@ the text as the git tag message and the GitHub Release notes.
 - Custom and unknown agent identities throughout sessions and agent selection.
 - Folderless chat creation and management alongside project conversations.
 - Side-by-side Codeg-Fork builds, XCTest coverage, and an optional UI-test target.
+- Session list long-press can delete a conversation. Confirming the alert calls
+  `delete_conversation` and drops the row; a failure leaves the list and shows
+  the existing error banner.
 
 ### Changed
 
 - Published fork setup and troubleshooting guidance; replaced machine-specific
   examples and E2E paths with portable configuration and removed internal logs.
+- Fork home-screen name is `Codeg New`. Codemagic `ios-unsigned-sideload` and
+  `scripts/build-fork.sh` pass `CODEG_DISPLAY_NAME=Codeg New`. Bundle IDs are
+  unchanged. The official `project.yml` default stays `Codeg`.
 
 ### Fixed
 
 - Unsigned Xcode 26.6 builds compile `RequestCancellation.checkDeadline`. The
   deadline closure no longer captures its result local before that local is
   declared.
+- New-task "Start chat (no folder)" stays on one line on narrow phones. The
+  pills sit side by side when they fit and stack when they do not.
 
 ## [Unreleased]
 

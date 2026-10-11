@@ -24,7 +24,7 @@ app container, UserDefaults domain, and default Keychain access group.
 
 | Build setting | Official default | Fork script |
 | --- | --- | --- |
-| `CODEG_DISPLAY_NAME` | `Codeg` | `Codeg-Fork` |
+| `CODEG_DISPLAY_NAME` | `Codeg` | `Codeg New` |
 | `CODEG_BUNDLE_ID` | `app.codeg.ios` | `app.codeg.ios.fork$(CODEG_BUNDLE_ID_SUFFIX)` |
 | `CODEG_URL_SCHEME` | `codeg` | `codegfork` |
 | `CODEG_FLAVOR` | `official` | `fork` |
@@ -32,7 +32,8 @@ app container, UserDefaults domain, and default Keychain access group.
 
 `project.yml` keeps the official defaults. `scripts/build-fork.sh` supplies fork
 settings only to its build invocation; the generated Xcode project retains the
-official defaults. About shows `Codeg-Fork · <short SHA>`. Commit changes before
+official defaults. The Codemagic `ios-unsigned-sideload` workflow passes the
+same `CODEG_DISPLAY_NAME`. About shows `Codeg New · <short SHA>`. Commit changes before
 building a review artifact so this marker identifies its source.
 
 The product and Swift module remain `Codeg`, and the output is `Codeg.app`.

@@ -250,6 +250,45 @@ final class ChatModeTests: XCTestCase {
         }
     }
 
+    @MainActor
+    func testDeleteConversationRemovesRowAndKeepsItOnFailure() async throws {
+        var deletedID: Int?
+        let api = client { request in
+            switch request.url?.lastPathComponent {
+            case "list_all_folder_details", "list_open_folder_details": return (200, "[]")
+            case "list_all_conversations": return (200, "[\(Self.summary)]")
+            case "delete_conversation":
+                deletedID = ChatHTTPFixture.body(request)["conversationId"] as? Int
+                return (200, "null")
+            default: return (200, "null")
+            }
+        }
+        let list = SessionListViewModel(client: api)
+        await list.load()
+        let conversation = try XCTUnwrap(list.conversations.first)
+        let removed = await list.delete(conversation)
+        XCTAssertTrue(removed)
+        XCTAssertEqual(deletedID, 42)
+        XCTAssertTrue(list.conversations.isEmpty)
+        XCTAssertNil(list.error)
+
+        let failing = client { request in
+            switch request.url?.lastPathComponent {
+            case "list_all_folder_details", "list_open_folder_details": return (200, "[]")
+            case "list_all_conversations": return (200, "[\(Self.summary)]")
+            case "delete_conversation": return (500, #"{"message":"nope"}"#)
+            default: return (200, "null")
+            }
+        }
+        let failedList = SessionListViewModel(client: failing)
+        await failedList.load()
+        let stillThere = try XCTUnwrap(failedList.conversations.first)
+        let failed = await failedList.delete(stillThere)
+        XCTAssertFalse(failed)
+        XCTAssertEqual(failedList.conversations.map(\.id), [42])
+        XCTAssertNotNil(failedList.error)
+    }
+
     static let folder = ##"{"id":7,"name":"Chat","path":"/scratch/chat","kind":"chat","last_opened_at":"2026-10-09T00:00:00Z","sort_order":0,"color":"#000000"}"##
     static let summary = #"{"id":42,"folder_id":7,"title":"Hello","kind":"chat","agent_type":"custom:e2e-mock","status":"pending_review","message_count":0,"created_at":"2026-10-09T00:00:00Z","updated_at":"2026-10-09T00:00:00Z"}"#
     static var created: String { "{\"conversation_id\":42,\"folder_id\":7,\"folder\":\(folder)}" }

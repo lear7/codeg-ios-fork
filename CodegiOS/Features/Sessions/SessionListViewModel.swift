@@ -185,6 +185,34 @@ final class SessionListViewModel {
         }
     }
 
+    // MARK: - Deleting
+
+    /// Ids with a `delete_conversation` call in flight, so a second long-press
+    /// confirm can't fire a duplicate request before the first returns.
+    private var deletingIDs: Set<Int> = []
+
+    /// Permanently delete a conversation via the server's `delete_conversation`
+    /// route (the same call the session detail screen uses). On success the row
+    /// is removed immediately. On failure the list is unchanged and `error`
+    /// carries a user-facing message. Returns whether the row was removed.
+    @discardableResult
+    func delete(_ conversation: ConversationSummary) async -> Bool {
+        guard !deletingIDs.contains(conversation.id) else { return false }
+        deletingIDs.insert(conversation.id)
+        defer { deletingIDs.remove(conversation.id) }
+        do {
+            try await client.deleteConversation(conversationId: conversation.id)
+            conversations.removeAll { $0.id == conversation.id }
+            error = nil
+            return true
+        } catch {
+            if let message = APIError.userMessage(error) {
+                self.error = message
+            }
+            return false
+        }
+    }
+
     // MARK: - Loading
 
     /// Initial load. Shows the full-screen loader and clears any prior error.

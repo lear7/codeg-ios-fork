@@ -19,7 +19,10 @@ struct SessionRow: View {
     /// When set, a long-press context menu offers Pin/Unpin (the label reflects
     /// `conversation.isPinned`). `.swipeActions` doesn't work inside the list's
     /// `LazyVStack`, so a context menu is the toggle affordance.
-    var onTogglePin: (() -> Void)?
+    var onTogglePin: (() -> Void)? = nil
+    /// When set, the same menu offers a destructive Delete. The host confirms
+    /// before it removes the session (`deleteSessionConfirmation`).
+    var onDelete: (() -> Void)? = nil
 
     var body: some View {
         if let onTap {
@@ -30,6 +33,17 @@ struct SessionRow: View {
                         Button(action: onTogglePin) {
                             Label(conversation.isPinned ? "Unpin" : "Pin",
                                   systemImage: conversation.isPinned ? "pin.slash" : "pin")
+                        }
+                    }
+                    if let onDelete {
+                        if onTogglePin != nil { Divider() }
+                        Button(role: .destructive) {
+                            // Defer until the menu has dismissed, or the confirmation
+                            // alert is dropped along with the context menu.
+                            let requestDelete = onDelete
+                            Task { @MainActor in requestDelete() }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
                         }
                     }
                 }
@@ -138,5 +152,48 @@ enum RelativeTime {
         let days = hours / 24
         if days < 7 { return "\(days)d" }
         return date.formatted(.dateTime.month(.abbreviated).day())
+    }
+}
+
+// MARK: - Delete confirmation
+
+/// Confirms a destructive session delete. Title and actions reuse the session
+/// detail alert (`Delete Session?` / Cancel / Delete) so zh-Hans stays in the
+/// string catalog. `presenting:` hands the row to the confirm button even if
+/// SwiftUI clears the binding while dismissing the alert.
+struct DeleteSessionConfirmation: ViewModifier {
+    @Binding var pending: ConversationSummary?
+    let onConfirm: (ConversationSummary) -> Void
+
+    func body(content: Content) -> some View {
+        content.alert(
+            "Delete Session?",
+            isPresented: Binding(
+                get: { pending != nil },
+                set: { showing in if !showing { pending = nil } }
+            ),
+            presenting: pending
+        ) { conversation in
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) { onConfirm(conversation) }
+        } message: { conversation in
+            Self.message(for: conversation)
+        }
+    }
+
+    /// Localized confirmation body. The title is an argument of the catalog
+    /// string, so a user-written name is not looked up as its own key.
+    private static func message(for conversation: ConversationSummary) -> Text {
+        let title = conversation.trimmedTitle ?? String(localized: "Untitled session")
+        return Text("“\(title)” will be permanently deleted. This can't be undone.")
+    }
+}
+
+extension View {
+    func deleteSessionConfirmation(
+        _ pending: Binding<ConversationSummary?>,
+        onConfirm: @escaping (ConversationSummary) -> Void
+    ) -> some View {
+        modifier(DeleteSessionConfirmation(pending: pending, onConfirm: onConfirm))
     }
 }

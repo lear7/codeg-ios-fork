@@ -24,7 +24,9 @@ packages:
 
 settings:
   base:
-    # Official defaults. scripts/build-fork.sh supplies all fork overrides.
+    # Official defaults. Fork overrides live on the xcodebuild command line:
+    # scripts/build-fork.sh and Codemagic workflow ios-unsigned-sideload
+    # (CODEG_DISPLAY_NAME=Codeg New). This value stays the official name.
     CODEG_DISPLAY_NAME: Codeg
     CODEG_BUNDLE_ID: app.codeg.ios
     CODEG_URL_SCHEME: codeg

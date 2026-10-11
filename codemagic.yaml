@@ -34,7 +34,7 @@ workflows:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             DEVELOPMENT_TEAM="" \
-            CODEG_DISPLAY_NAME=Codeg-Fork \
+            CODEG_DISPLAY_NAME="Codeg New" \
             CODEG_BUNDLE_ID=app.codeg.ios.fork \
             CODEG_URL_SCHEME=codegfork \
             CODEG_FLAVOR=fork \
