@@ -1,0 +1,55 @@
+workflows:
+  ios-unsigned-sideload:
+    name: iOS Unsigned IPA (Sideloadly)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      xcode: 26.6
+      vars:
+        XCODE_PROJECT: CodegiOS.xcodeproj
+        XCODE_SCHEME: CodegiOS
+    scripts:
+      - name: Install XcodeGen
+        script: |
+          brew install xcodegen
+      - name: Generate Xcode project
+        script: |
+          xcodegen generate
+      - name: Build unsigned device app
+        script: |
+          set -euo pipefail
+          COMMIT="$(git rev-parse --short HEAD)"
+          xcodebuild build \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -configuration Debug \
+            -sdk iphoneos \
+            -derivedDataPath build/derived \
+            -skipMacroValidation \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM="" \
+            CODEG_DISPLAY_NAME=Codeg-Fork \
+            CODEG_BUNDLE_ID=app.codeg.ios.fork \
+            CODEG_URL_SCHEME=codegfork \
+            CODEG_FLAVOR=fork \
+            "CODEG_BUILD_COMMIT=$COMMIT"
+      - name: Package unsigned IPA
+        script: |
+          set -euo pipefail
+          APP="build/derived/Build/Products/Debug-iphoneos/Codeg.app"
+          test -d "$APP"
+          rm -rf build/Payload
+          mkdir -p build/Payload
+          cp -R "$APP" build/Payload/
+          (
+            cd build
+            rm -f Codeg-Fork-unsigned.ipa
+            zip -qr Codeg-Fork-unsigned.ipa Payload
+          )
+          ls -lh build/Codeg-Fork-unsigned.ipa
+    artifacts:
+      - build/Codeg-Fork-unsigned.ipa
+      - build/derived/Build/Products/Debug-iphoneos/*.app
+      - /tmp/xcodebuild_logs/*.log
