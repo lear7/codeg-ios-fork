@@ -28,6 +28,11 @@ the text as the git tag message and the GitHub Release notes.
 
 ### Changed
 
+- Deployment target is iOS 18.0 (app, unit tests, and UI tests). iOS 26 still
+  uses Liquid Glass (`glassEffect`, `GlassEffectContainer`, `.glass`, and
+  `.glassProminent`). iOS 18 falls back to ultra-thin material and bordered
+  buttons. The accent trait bridge stays on iOS 26; iOS 18 writes the same
+  palette through the window scene so theme colors still resolve.
 - Published fork setup and troubleshooting guidance; replaced machine-specific
   examples and E2E paths with portable configuration and removed internal logs.
 - Fork home-screen name is `Codeg New`. Codemagic `ios-unsigned-sideload` and

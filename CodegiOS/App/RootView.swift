@@ -70,6 +70,7 @@ struct RootView: View {
         .sheet(isPresented: $model.serversSheetPresented) {
             ManageServersSheet(store: model.serverStore, selectedServerID: $model.selectedServerID)
         }
+        .codegAccentSceneFallback(appearance.accent)
     }
 
     /// Identity for the activity poller's `.task` — composes everything that

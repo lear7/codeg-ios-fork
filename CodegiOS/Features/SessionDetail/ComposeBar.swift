@@ -80,7 +80,7 @@ struct ComposeBar: View {
 
             mentionSuggestions
 
-            GlassEffectContainer(spacing: 8) {
+            CodegGlassContainer(spacing: 8) {
                 HStack(alignment: .bottom, spacing: 8) {
                     addButton
                     // `UITextView`-backed, not a plain `TextField`: reports the
@@ -105,7 +105,7 @@ struct ComposeBar: View {
                         // `xl` radius clamps to a capsule while the field is one
                         // line (rhyming with the round +/send buttons) and relaxes
                         // to a rounded rect as it grows — no hard switch needed.
-                        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.xl, style: .continuous))
+                        .codegGlass(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.xl, style: .continuous))
                         .hairlineBorder(Theme.Radius.xl)
 
                     actionButton
@@ -196,7 +196,7 @@ struct ComposeBar: View {
                 .font(.system(size: 16, weight: .semibold))
                 .frame(width: 26, height: 26)
         }
-        .buttonStyle(.glass)
+        .codegGlassButtonStyle()
         .clipShape(Circle())
         .tint(Theme.textSecondary)
         .accessibilityLabel("Add or insert")
@@ -210,7 +210,7 @@ struct ComposeBar: View {
                     .font(.system(size: 16, weight: .bold))
                     .frame(width: 26, height: 26)
             }
-            .buttonStyle(.glassProminent)
+            .codegGlassProminentButtonStyle()
             .tint(Theme.danger)
             .clipShape(Circle())
             .transition(.scale.combined(with: .opacity))
@@ -221,7 +221,7 @@ struct ComposeBar: View {
                     .font(.system(size: 16, weight: .bold))
                     .frame(width: 26, height: 26)
             }
-            .buttonStyle(.glassProminent)
+            .codegGlassProminentButtonStyle()
             .tint(Theme.accent)
             .clipShape(Circle())
             .disabled(!canSend)
@@ -264,7 +264,7 @@ struct ComposeBar: View {
                 }
                 .frame(maxHeight: min(CGFloat(matches.count) * 44, 5.5 * 44))
                 .scrollBounceBehavior(.basedOnSize)
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.md, style: .continuous))
+                .codegGlass(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.md, style: .continuous))
                 .hairlineBorder(Theme.Radius.md)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
@@ -367,7 +367,7 @@ private struct NoticeBanner: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 9)
-        .glassEffect(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.md, style: .continuous))
+        .codegGlass(.regular, in: RoundedRectangle(cornerRadius: Theme.Radius.md, style: .continuous))
         .hairlineBorder(Theme.Radius.md, color: Theme.accent.opacity(0.35))
         .transition(.opacity.combined(with: .move(edge: .bottom)))
     }

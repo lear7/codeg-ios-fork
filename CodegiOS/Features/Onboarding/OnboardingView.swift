@@ -25,7 +25,7 @@ struct OnboardingView: View {
                     .font(.system(size: 34, weight: .semibold))
                     .foregroundStyle(Theme.accent)
                     .frame(width: 84, height: 84)
-                    .glassEffect(.regular.tint(Theme.accentDim), in: RoundedRectangle(cornerRadius: Theme.Radius.xl, style: .continuous))
+                    .codegGlass(.tinted(Theme.accentDim), in: RoundedRectangle(cornerRadius: Theme.Radius.xl, style: .continuous))
                     .hairlineBorder(Theme.Radius.xl, color: Theme.accent.opacity(0.3))
                     .padding(.bottom, 24)
 

@@ -319,7 +319,7 @@ struct ServerEditorSheet: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 4)
             }
-            .buttonStyle(.glass)
+            .codegGlassButtonStyle()
             .tint(Theme.accent)
             .disabled(model.isTesting || !model.canTest)
 

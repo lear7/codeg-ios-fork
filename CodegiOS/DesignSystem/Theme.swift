@@ -300,6 +300,9 @@ enum AccentPalette: Int, CaseIterable, Identifiable {
 /// dynamic `UIColor`s can resolve the accent the same way they resolve light/dark.
 struct AccentPaletteTrait: UITraitDefinition {
     static let defaultValue = AccentPalette.neutral.rawValue
+    /// Accent fills are dynamic colors. A change has to invalidate color
+    /// appearance so the iOS 18 scene override re-resolves `Theme.accent`.
+    static let affectsColorAppearance = true
 }
 
 extension UITraitCollection {
@@ -312,9 +315,17 @@ extension UITraitCollection {
 /// Setting the environment value writes through to the trait collection, which
 /// propagates to all descendants (and presented sheets) and re-resolves every
 /// accent-backed dynamic color in place — no view rebuild.
-struct CodegAccentKey: EnvironmentKey, UITraitBridgedEnvironmentKey {
+///
+/// The UIKit bridge conformance is iOS 26 only. On iOS 18, SwiftUI's lookup of
+/// `UITraitBridgedEnvironmentKey` can crash while resolving the witness table,
+/// so that OS writes the same raw value through `UIWindowScene.traitOverrides`
+/// (`codegAccentSceneFallback`) instead.
+struct CodegAccentKey: EnvironmentKey {
     static let defaultValue: AccentPalette = .neutral
+}
 
+@available(iOS 26, *)
+extension CodegAccentKey: UITraitBridgedEnvironmentKey {
     static func read(from traitCollection: UITraitCollection) -> AccentPalette {
         traitCollection.accentPalette
     }
@@ -345,6 +356,74 @@ extension View {
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .strokeBorder(color, lineWidth: 0.75)
         )
+    }
+}
+
+extension View {
+    /// Keeps `Theme.accent` in sync on iOS 18, where the trait bridge is not
+    /// installed. The background is empty on iOS 26 — that OS already writes
+    /// the trait from `\.codegAccent`, and the foreground view is not wrapped.
+    func codegAccentSceneFallback(_ palette: AccentPalette) -> some View {
+        background {
+            if #available(iOS 26, *) {
+                EmptyView()
+            } else {
+                AccentPaletteSceneOverride(palette: palette)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+            }
+        }
+    }
+}
+
+/// Installs `palette` on the hosting window scene. Zero visual contribution.
+private struct AccentPaletteSceneOverride: UIViewRepresentable {
+    var palette: AccentPalette
+
+    func makeUIView(context: Context) -> AccentPaletteTraitView {
+        let view = AccentPaletteTraitView()
+        view.paletteRaw = palette.rawValue
+        return view
+    }
+
+    func updateUIView(_ uiView: AccentPaletteTraitView, context: Context) {
+        uiView.paletteRaw = palette.rawValue
+    }
+}
+
+private final class AccentPaletteTraitView: UIView {
+    var paletteRaw: Int = AccentPalette.neutral.rawValue {
+        didSet {
+            guard oldValue != paletteRaw else { return }
+            apply()
+        }
+    }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        isUserInteractionEnabled = false
+        backgroundColor = .clear
+        isAccessibilityElement = false
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        apply()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        apply()
+    }
+
+    private func apply() {
+        guard let scene = window?.windowScene else { return }
+        if scene.traitOverrides[AccentPaletteTrait.self] == paletteRaw { return }
+        scene.traitOverrides[AccentPaletteTrait.self] = paletteRaw
     }
 }
 

@@ -10,7 +10,7 @@ struct GlassCard<Content: View>: View {
     var body: some View {
         content()
             .padding(padding)
-            .glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .codegGlass(.regular, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
             .hairlineBorder(cornerRadius)
     }
 }
@@ -93,8 +93,8 @@ struct GlassRow<Content: View>: View {
         content()
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
-            .glassEffect(
-                isSelected ? .regular.tint(Theme.accent.opacity(0.22)) : .regular,
+            .codegGlass(
+                isSelected ? .tinted(Theme.accent.opacity(0.22)) : .regular,
                 in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             )
             .hairlineBorder(cornerRadius, color: isSelected ? Theme.accent.opacity(0.45) : Theme.surfaceStroke)
@@ -247,7 +247,7 @@ struct PrimaryGlassButton: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 4)
         }
-        .buttonStyle(.glassProminent)
+        .codegGlassProminentButtonStyle()
         .tint(tint)
         .disabled(isLoading)
     }

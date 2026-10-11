@@ -44,8 +44,10 @@ Use the fork build script for local fork builds.
 ## Setup and signing
 
 Install Xcode 26 with an iOS 26 simulator runtime, XcodeGen, and Python 3. The
-first build resolves SwiftTerm through Swift Package Manager and needs network
-access. Simulator builds do not need an Apple Developer account.
+deployment target is iOS 18.0, so unsigned and signed builds install on iOS 18
+devices; compiling still uses the iOS 26 SDK. The first build resolves
+SwiftTerm through Swift Package Manager and needs network access. Simulator
+builds do not need an Apple Developer account.
 
 For signed device builds, configure your Apple ID in Xcode, then create the local
 override if it does not already exist:

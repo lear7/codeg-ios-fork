@@ -14,8 +14,8 @@ This fork is based on **xintaofei/codeg-ios**, with modifications by **PanAndDuc
 **服务端兼容 / Server compatibility:** 标准 codeg 支持局域网与基础功能；中继配对需要带内置 relay client、支持 `/__codeg_relay/v1` 协议的 codeg 服务端，例如 [codeg-fork](https://github.com/PanAndDuck/codeg-fork)（提供各平台安装包和 `codeg-relay` 中继服务端）。
 Stock codeg works for LAN/basic features. Relay pairing requires a codeg server with the built-in relay client implementing the `/__codeg_relay/v1` protocol, such as [codeg-fork](https://github.com/PanAndDuck/codeg-fork) (desktop/server packages plus the `codeg-relay` server). Optional features depend on the server's API support.
 
-**构建 / Build:** 使用 Xcode 26、iOS 26 SDK、[XcodeGen](https://github.com/yonaskolb/XcodeGen) 与 Python 3。签名配置从示例复制并填写自己的 Team ID；已有本地配置时保留它。
-Use Xcode 26, the iOS 26 SDK, XcodeGen, and Python 3. Copy the signing example if no local override exists, then enter your own team ID for signed device builds. Simulator builds do not require signing.
+**构建 / Build:** 使用 Xcode 26、iOS 26 SDK、[XcodeGen](https://github.com/yonaskolb/XcodeGen) 与 Python 3。部署目标是 iOS 18.0，可安装到 iOS 18 设备。签名配置从示例复制并填写自己的 Team ID；已有本地配置时保留它。
+Use Xcode 26 and the iOS 26 SDK, with a deployment target of iOS 18.0 so the app installs on iOS 18 devices. Also install XcodeGen and Python 3. Copy the signing example if no local override exists, then enter your own team ID for signed device builds. Simulator builds do not require signing.
 
 ```bash
 cp Config/Signing.local.xcconfig.example Config/Signing.local.xcconfig
@@ -39,8 +39,9 @@ scripts/build-fork.sh device --device "<device-name>"
 A native, universal (iPhone + iPad) SwiftUI client for the [codeg](https://github.com/xintaofei/codeg)
 multi-agent coding server. Manage your codeg servers, browse their sessions, read
 the full transcript, and reply to the agent with the response streaming back in
-real time. Built for iOS 26 with Apple's **Liquid Glass** design language and a
-dark, developer-focused aesthetic.
+real time. The deployment target is **iOS 18**. iOS 26 keeps Apple's **Liquid Glass**
+design language; iOS 18 uses material backgrounds and bordered buttons. The
+aesthetic stays dark and developer-focused.
 
 The app is a **pure API client** — all agent and conversation logic lives on the
 codeg backend; the app only calls its HTTP + WebSocket API.
@@ -58,7 +59,7 @@ codeg backend; the app only calls its HTTP + WebSocket API.
 
 ## Requirements
 
-- Xcode 26 / iOS 26 SDK
+- Xcode 26 / iOS 26 SDK (deployment target iOS 18.0)
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`) — the
   Xcode project is generated from `project.yml`
 
