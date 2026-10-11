@@ -28,6 +28,12 @@ the text as the git tag message and the GitHub Release notes.
 - Published fork setup and troubleshooting guidance; replaced machine-specific
   examples and E2E paths with portable configuration and removed internal logs.
 
+### Fixed
+
+- Unsigned Xcode 26.6 builds compile `RequestCancellation.checkDeadline`. The
+  deadline closure no longer captures its result local before that local is
+  declared.
+
 ## [Unreleased]
 
 ### Added

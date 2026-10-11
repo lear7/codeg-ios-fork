@@ -175,13 +175,16 @@ private final class RequestCancellation: @unchecked Sendable {
     }
 
     private func checkDeadline() {
-        let task = lock.withLock { () -> URLSessionTask? in
-            guard !completed, !cancelled, let task,
+        // Bind the property explicitly. Shorthand `let task` means `let task = task`,
+        // and this closure is the initializer of that local, so the compiler rejects
+        // the capture (Xcode 26.6: "closure captures 'task' before it is declared").
+        let expiredTask = lock.withLock { () -> URLSessionTask? in
+            guard !completed, !cancelled, let task = self.task,
                   deadline?.expired(bytesSent: task.countOfBytesSent) == true else { return nil }
             timedOut = true
             return task
         }
-        task?.cancel()
+        expiredTask?.cancel()
     }
 
     func finish() -> Bool {
