@@ -12,6 +12,10 @@ workflows:
       - name: Install XcodeGen
         script: |
           brew install xcodegen
+      - name: Install Metal Toolchain
+        script: |
+          xcodebuild -downloadComponent MetalToolchain
+          xcodebuild -runFirstLaunch || true
       - name: Generate Xcode project
         script: |
           xcodegen generate
