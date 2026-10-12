@@ -422,7 +422,13 @@ private final class AccentPaletteTraitView: UIView {
 
     private func apply() {
         guard let scene = window?.windowScene else { return }
-        if scene.traitOverrides[AccentPaletteTrait.self] == paletteRaw { return }
+        // Reading an override that was never set raises an ObjC exception
+        // ("trait override not set") on iOS 17/18, so check `contains` first.
+        let overrides = scene.traitOverrides
+        if overrides.contains(AccentPaletteTrait.self),
+           overrides[AccentPaletteTrait.self] == paletteRaw {
+            return
+        }
         scene.traitOverrides[AccentPaletteTrait.self] = paletteRaw
     }
 }
