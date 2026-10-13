@@ -47,7 +47,8 @@ struct RootView: View {
         .environment(\.locale, language.locale)
         .preferredColorScheme(appearance.mode.colorScheme)
         // App Font Size (Settings): steps the inherited Dynamic Type size down
-        // once at the root so every screen and sheet scales. The separate Chat
+        // once at the root so every screen and sheet scales. 极小 also applies
+        // the one-time 13pt floor scale inside that modifier. The separate Chat
         // Font Size stacks on top inside SessionDetailView.
         .appFontSize()
         .task { model.serverStore.startEndpointMonitoring() }
