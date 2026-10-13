@@ -343,9 +343,12 @@ extension EnvironmentValues {
 }
 
 extension Font {
-    /// Monospaced face for code, file paths, IDs, and token counts.
+    /// Monospaced face for code, file paths, IDs, and token counts. `size` is the
+    /// point size at the default Dynamic Type size; `relativeTo: .body` makes it
+    /// follow Dynamic Type (and so the App / Chat Font Size settings) live.
+    /// Menlo, because `.system(size:design:)` is fixed and never scales.
     static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
-        .system(size: size, weight: weight, design: .monospaced)
+        .custom("Menlo", size: size, relativeTo: .body).weight(weight)
     }
 }
 

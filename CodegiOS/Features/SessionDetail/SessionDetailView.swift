@@ -62,6 +62,7 @@ struct SessionDetailView: View {
             CodegBackground()
             content
                 .environment(\.agentDisplayNames, model.agentNames)
+                .chatFontSize()
         }
         .navigationTitle(navTitle)
         .navigationBarTitleDisplayMode(.inline)
@@ -567,7 +568,7 @@ private struct SessionActionsMenu: View {
                 ChatFontSizePicker()
                     .pickerStyle(.inline)
             } label: {
-                Label("Font Size", systemImage: "textformat.size")
+                Label("Chat Font Size", systemImage: "textformat.size")
             }
             Divider()
             Button(role: .destructive, action: onDelete) {
