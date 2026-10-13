@@ -15,6 +15,7 @@ struct SettingsView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(AppearanceStore.self) private var appearance
     @Environment(LanguageStore.self) private var language
+    @AppStorage(ChatFontSize.storageKey) private var chatFontSize: ChatFontSize = .normal
 
     /// Live server version, fetched from `health`, pre-loaded here so the pushed
     /// About screen has it ready.
@@ -57,6 +58,8 @@ struct SettingsView: View {
             appearanceRow
             SettingsRowDivider()
             languageRow
+            SettingsRowDivider()
+            fontSizeRow
             SettingsRowDivider()
             leafRow(.general)
             SettingsRowDivider()
@@ -121,6 +124,22 @@ struct SettingsView: View {
                 // Compose from the localized enum keys via `Text` interpolation so
                 // each piece re-resolves live with the app language.
                 detail: "\(Text(appearance.mode.titleKey)) · \(Text(appearance.accent.titleKey))"
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    /// Font Size opens an in-place menu (same persisted value as the session
+    /// "…" menu); the detail shows the current choice.
+    private var fontSizeRow: some View {
+        Menu {
+            ChatFontSizePicker()
+                .pickerStyle(.inline)
+        } label: {
+            SettingsGroupedRowLabel(
+                icon: "textformat.size",
+                title: "Font Size",
+                detail: chatFontSize.titleKey
             )
         }
         .buttonStyle(.plain)
