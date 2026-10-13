@@ -62,7 +62,6 @@ struct SessionDetailView: View {
             CodegBackground()
             content
                 .environment(\.agentDisplayNames, model.agentNames)
-                .chatFontSize()
         }
         .navigationTitle(navTitle)
         .navigationBarTitleDisplayMode(.inline)
