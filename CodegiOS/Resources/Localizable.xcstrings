@@ -1,6 +1,70 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Font Size" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Font Size"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "字体大小"
+          }
+        }
+      }
+    },
+    "Normal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "普通"
+          }
+        }
+      }
+    },
+    "Small" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Small"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "小"
+          }
+        }
+      }
+    },
+    "Extra Small" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extra Small"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "极小"
+          }
+        }
+      }
+    },
     "Chat": {
       "extractionState": "manual",
       "localizations": {

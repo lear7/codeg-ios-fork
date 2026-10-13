@@ -62,6 +62,7 @@ struct SessionDetailView: View {
             CodegBackground()
             content
                 .environment(\.agentDisplayNames, model.agentNames)
+                .chatFontSize()
         }
         .navigationTitle(navTitle)
         .navigationBarTitleDisplayMode(.inline)
@@ -562,6 +563,12 @@ private struct SessionActionsMenu: View {
                 }
             } label: {
                 Label("Change Status", systemImage: "circle.dashed")
+            }
+            Menu {
+                ChatFontSizePicker()
+                    .pickerStyle(.inline)
+            } label: {
+                Label("Font Size", systemImage: "textformat.size")
             }
             Divider()
             Button(role: .destructive, action: onDelete) {
